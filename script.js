@@ -67,8 +67,12 @@ const toggleTransitLayer = () => {
 };
 
 // Example: Assume you have two buttons for toggling traffic and transit layers
-document.getElementById("toggle-traffic").addEventListener("click", toggleTrafficLayer);
-document.getElementById("toggle-transit").addEventListener("click", toggleTransitLayer);
+document
+  .getElementById("toggle-traffic")
+  .addEventListener("click", toggleTrafficLayer);
+document
+  .getElementById("toggle-transit")
+  .addEventListener("click", toggleTransitLayer);
 
 /** Initializes Street View service and panorama */
 const initializeStreetView = () => {
@@ -185,7 +189,6 @@ const createPegmanControl = (controlDiv) => {
         anchor: new google.maps.Point(11, 11),
       },
     });
-    // Event listener for Pegman drag end event
     google.maps.event.addListener(pegman, "dragend", (event) => {
       const location = event.latLng;
       streetViewService.getPanorama(
