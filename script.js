@@ -1,4 +1,3 @@
-// Define map, markers, and selectedLocation variables
 let map;
 let markers = [];
 let selectedLocation;
@@ -9,6 +8,10 @@ const defaultLocations = [
   { name: "Kutaisi", lat: 42.2679, lng: 42.6946 },
   { name: "Batumi", lat: 41.6168, lng: 41.6367 }
 ];
+
+// Layers
+let trafficLayer;
+let transitLayer;
 
 /**
  * Initializes the Google Map on page load.
@@ -25,6 +28,15 @@ const initMap = () => {
     center: initialCenter,
   });
 
+  // Create layers
+  trafficLayer = new google.maps.TrafficLayer();
+  transitLayer = new google.maps.TransitLayer();
+
+  // Create layer controls and position them
+  const layerControlDiv = document.createElement("div");
+  createLayerControls(layerControlDiv);
+  map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(layerControlDiv);
+
   // Load default locations
   defaultLocations.forEach(location => {
     placeMarker(new google.maps.LatLng(location.lat, location.lng), false);
@@ -40,6 +52,53 @@ const initMap = () => {
   map.addListener("click", (event) => {
     placeMarker(event.latLng, true);
   });
+};
+
+/**
+ * Creates layer controls for traffic and transit layers.
+ * @param {HTMLElement} controlDiv - The div element to hold the controls.
+ */
+const createLayerControls = (controlDiv) => {
+  // Set CSS for the control border
+  const controlUI = document.createElement("div");
+  controlUI.style.backgroundColor = "#fff";
+  controlUI.style.border = "2px solid #fff";
+  controlUI.style.borderRadius = "3px";
+  controlUI.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlUI.style.cursor = "pointer";
+  controlUI.style.marginBottom = "22px";
+  controlUI.style.textAlign = "center";
+  controlUI.title = "Click to toggle layers";
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior
+  const controlText = document.createElement("div");
+  controlText.style.color = "rgb(25,25,25)";
+  controlText.style.fontFamily = "Roboto,Arial,sans-serif";
+  controlText.style.fontSize = "16px";
+  controlText.style.lineHeight = "38px";
+  controlText.style.paddingLeft = "5px";
+  controlText.style.paddingRight = "5px";
+  controlText.innerHTML = "Toggle Layers";
+  controlUI.appendChild(controlText);
+
+  // Add event listeners to toggle layers
+  controlUI.addEventListener("click", () => {
+    toggleLayer(trafficLayer);
+    toggleLayer(transitLayer);
+  });
+};
+
+/**
+ * Toggles the given layer on the map.
+ * @param {google.maps.TrafficLayer|google.maps.TransitLayer} layer - The layer to be toggled.
+ */
+const toggleLayer = (layer) => {
+  if (layer.getMap()) {
+    layer.setMap(null);
+  } else {
+    layer.setMap(map);
+  }
 };
 
 /**
