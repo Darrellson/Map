@@ -1,15 +1,15 @@
 /** @type {google.maps.Map} */
-let map; 
+let map;
 /** @type {google.maps.Marker[]} */
-let markers = []; 
+let markers = [];
 /** @type {{ lat: number, lng: number }} */
-let selectedLocation; 
+let selectedLocation;
 
 /** Default locations to be initially displayed on the map */
 const defaultLocations = [
   { name: "Tbilisi", lat: 41.7151, lng: 44.8271 },
   { name: "Kutaisi", lat: 42.2679, lng: 42.6946 },
-  { name: "Batumi", lat: 41.6168, lng: 41.6367 }
+  { name: "Batumi", lat: 41.6168, lng: 41.6367 },
 ];
 
 /** Google Maps layers */
@@ -25,12 +25,14 @@ const initMap = () => {
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 7,
     center: initialCenter,
-    streetViewControl: false
+    streetViewControl: false,
   });
-  initializeLayers(); 
+  initializeLayers();
   initializeStreetView();
   loadMarkersFromDefaultLocations();
   loadMarkersFromSavedLocations();
+  trafficLayer = new google.maps.TrafficLayer();
+  transitLayer = new google.maps.TransitLayer();
 
   // Event listener for placing markers on map click
   map.addListener("click", (event) => {
@@ -46,6 +48,28 @@ const initializeLayers = () => {
   transitLayer = new google.maps.TransitLayer();
 };
 
+// Function to toggle traffic layer
+const toggleTrafficLayer = () => {
+  if (trafficLayer.getMap()) {
+    trafficLayer.setMap(null);
+  } else {
+    trafficLayer.setMap(map);
+  }
+};
+
+// Function to toggle transit layer
+const toggleTransitLayer = () => {
+  if (transitLayer.getMap()) {
+    transitLayer.setMap(null);
+  } else {
+    transitLayer.setMap(map);
+  }
+};
+
+// Example: Assume you have two buttons for toggling traffic and transit layers
+document.getElementById("toggle-traffic").addEventListener("click", toggleTrafficLayer);
+document.getElementById("toggle-transit").addEventListener("click", toggleTransitLayer);
+
 /** Initializes Street View service and panorama */
 const initializeStreetView = () => {
   streetViewService = new google.maps.StreetViewService();
@@ -58,7 +82,7 @@ const initializeStreetView = () => {
 
 /** Loads markers from default locations onto the map */
 const loadMarkersFromDefaultLocations = () => {
-  defaultLocations.forEach(location => {
+  defaultLocations.forEach((location) => {
     placeMarker(new google.maps.LatLng(location.lat, location.lng), false);
   });
 };
@@ -66,7 +90,7 @@ const loadMarkersFromDefaultLocations = () => {
 /** Loads markers from saved locations (cookies) onto the map */
 const loadMarkersFromSavedLocations = () => {
   const savedLocations = getLocationsFromCookies();
-  savedLocations.forEach(location => {
+  savedLocations.forEach((location) => {
     placeMarker(new google.maps.LatLng(location.lat, location.lng), false);
   });
 };
@@ -79,14 +103,14 @@ const loadMarkersFromSavedLocations = () => {
 const placeMarker = (location, addToCookie) => {
   const marker = new google.maps.Marker({
     position: location,
-    map: map
+    map: map,
   });
   markers.push(marker);
 
-  selectedLocation = {lat: location.lat(), lng: location.lng()};
+  selectedLocation = { lat: location.lat(), lng: location.lng() };
 
   if (addToCookie) {
-    saveLocationToCookies(selectedLocation); 
+    saveLocationToCookies(selectedLocation);
   }
 };
 
@@ -105,8 +129,10 @@ const saveLocationToCookies = (location) => {
  * @returns {Array<{ lat: number, lng: number }>} Array of saved locations
  */
 const getLocationsFromCookies = () => {
-  const cookieString = document.cookie.split('; ').find(row => row.startsWith('locations='));
-  return cookieString ? JSON.parse(cookieString.split('=')[1]) : [];
+  const cookieString = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("locations="));
+  return cookieString ? JSON.parse(cookieString.split("=")[1]) : [];
 };
 
 /** Sets up the Pegman control for Street View */
@@ -141,7 +167,8 @@ const createPegmanControl = (controlDiv) => {
   controlText.innerHTML = "Pegman";
   controlUI.appendChild(controlText);
   const pegmanIcon = document.createElement("img");
-  pegmanIcon.src = "https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-2x.png";
+  pegmanIcon.src =
+    "https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-2x.png";
   pegmanIcon.style.width = "38px";
   pegmanIcon.style.height = "38px";
   controlUI.appendChild(pegmanIcon);
@@ -155,13 +182,16 @@ const createPegmanControl = (controlDiv) => {
         url: "https://maps.gstatic.com/tactile/mylocation/mylocation-sprite-2x.png",
         size: new google.maps.Size(22, 22),
         origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(11, 11)
-      }
+        anchor: new google.maps.Point(11, 11),
+      },
     });
     // Event listener for Pegman drag end event
-    google.maps.event.addListener(pegman, 'dragend', (event) => {
+    google.maps.event.addListener(pegman, "dragend", (event) => {
       const location = event.latLng;
-      streetViewService.getPanorama({ location: location, radius: 50 }, processSVData);
+      streetViewService.getPanorama(
+        { location: location, radius: 50 },
+        processSVData
+      );
     });
   });
 };
@@ -188,7 +218,7 @@ const processSVData = (data, status) => {
     streetViewPanorama.setPosition(data.location.latLng);
     streetViewPanorama.setVisible(true);
   } else {
-    alert('Street View data not found for this location.');
+    alert("Street View data not found for this location.");
   }
 };
 
@@ -209,4 +239,4 @@ const downloadJSON = (jsonData, filename) => {
   document.body.removeChild(a);
 };
 
-window.onload = initMap; 
+window.onload = initMap;
