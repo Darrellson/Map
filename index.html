@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Map</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf5FsuRhY_xLuVld4kH0CKdg8D7BlU2hI"></script>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>Google Maps API Example</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1 class="my-4">Select a Location in Georgia</h1>
-    <div id="map"></div>
-    <button id="save-btn" class="btn btn-primary mt-4">Save Location</button>
+  <div id="map"></div>
+  <div id="street-view"></div>
+  <div id="controls" class="bg-light p-3">
+    <button id="toggle-traffic" class="btn btn-primary mb-3">Toggle Traffic</button><br>
+    <button id="toggle-transit" class="btn btn-primary mb-3">Toggle Transit</button><br>
+    <button id="pegman" class="btn btn-primary mb-3">Pegman</button><br>
+    <button id="save-btn" class="btn btn-success">Save</button>
   </div>
 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf5FsuRhY_xLuVld4kH0CKdg8D7BlU2hI" async defer></script>
   <script src="script.js"></script>
 </body>
 </html>
