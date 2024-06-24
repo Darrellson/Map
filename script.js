@@ -20,12 +20,22 @@ let streetViewService;
 let streetViewPanorama;
 
 /** Function to initialize the map and its functionalities */
+/** Function to initialize the map and its functionalities */
 const initMap = () => {
   const initialCenter = { lat: 42.3154, lng: 43.3569 };
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 7,
     center: initialCenter,
     streetViewControl: false,
+    restriction: {
+      latLngBounds: {
+        north: 43.586,
+        south: 41.055,
+        east: 46.637,
+        west: 39.980,
+      },
+      strictBounds: true,
+    },
   });
   initializeLayers();
   initializeStreetView();
