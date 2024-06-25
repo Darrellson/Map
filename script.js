@@ -21,10 +21,10 @@ const initMap = () => {
     streetViewControl: false,
     restriction: {
       latLngBounds: {
-        north: 43.8,
-        south: 41.0,
-        east: 47.0,
-        west: 39.0,
+        north: 44.0, 
+        south: 41.0, 
+        east: 49.0, 
+        west: 38.5,
       },
       strictBounds: true,
     },
@@ -36,10 +36,7 @@ const initMap = () => {
   loadMarkersFromSavedLocations();
   setupControls();
 
-  // Debugging: Log zoom level to console to check if it's set correctly
-  console.log("Current Zoom Level:", map.getZoom());
 };
-
 
 const initializeLayers = () => {
   trafficLayer = new google.maps.TrafficLayer();
