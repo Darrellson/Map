@@ -1,145 +1,153 @@
-let map;
-let markers = [];
-let selectedLocation;
+let map, panorama, trafficLayer, transitLayer;
 
+/**
+ * Defines the geographical bounds of Georgia (country).
+ */
+const georgiaBounds = {
+  north: 44.0,
+  south: 41.0,
+  east: 49.0,
+  west: 38.0,
+};
+
+/**
+ * Defines the default locations (markers) in Georgia.
+ */
 const defaultLocations = [
-  { name: "Tbilisi", lat: 41.7151, lng: 44.8271 },
-  { name: "Kutaisi", lat: 42.2679, lng: 42.6946 },
-  { name: "Batumi", lat: 41.6168, lng: 41.6367 },
+  { lat: 41.7151, lng: 44.8271, title: "Tbilisi" },
+  { lat: 42.2679, lng: 42.718, title: "Kutaisi" },
+  { lat: 41.6168, lng: 41.6367, title: "Batumi" },
 ];
 
-let trafficLayer;
-let transitLayer;
-let streetViewService;
-let streetViewPanorama;
-
+/**
+ * Initializes the Google Map and sets it up with various layers and controls.
+ */
 const initMap = () => {
-  const initialCenter = { lat: 41.7, lng: 43.5 };
+  // Initialize map centered on Georgia (country) with restrictions to stay within its bounds
   map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 4,
-    center: initialCenter,
+    mapTypeId: "roadmap",
     streetViewControl: false,
     restriction: {
-      latLngBounds: {
-        north: 44.0, 
-        south: 41.0, 
-        east: 49.0, 
-        west: 38.5,
-      },
+      latLngBounds: georgiaBounds,
       strictBounds: true,
     },
   });
 
-  initializeLayers();
-  initializeStreetView();
-  loadMarkersFromDefaultLocations();
-  loadMarkersFromSavedLocations();
-  setupControls();
-
-};
-
-const initializeLayers = () => {
-  trafficLayer = new google.maps.TrafficLayer();
-  transitLayer = new google.maps.TransitLayer();
-};
-
-const toggleTrafficLayer = () => {
-  if (trafficLayer.getMap()) {
-    trafficLayer.setMap(null);
-  } else {
-    trafficLayer.setMap(map);
-  }
-};
-
-const toggleTransitLayer = () => {
-  if (transitLayer.getMap()) {
-    transitLayer.setMap(null);
-  } else {
-    transitLayer.setMap(map);
-  }
-};
-
-const setupControls = () => {
-  const trafficControl = document.getElementById("toggle-traffic");
-  const transitControl = document.getElementById("toggle-transit");
-  const pegmanControl = document.getElementById("pegman");
-  const saveButton = document.getElementById("save-btn");
-
-  trafficControl.addEventListener("click", toggleTrafficLayer);
-  transitControl.addEventListener("click", toggleTransitLayer);
-  pegmanControl.addEventListener("click", toggleStreetView);
-  saveButton.addEventListener("click", saveLocation);
-};
-
-const initializeStreetView = () => {
-  streetViewService = new google.maps.StreetViewService();
-  streetViewPanorama = new google.maps.StreetViewPanorama(
-    document.getElementById("map"),
-    {
-      visible: false,
-      position: map.getCenter(),
-    }
+  // Fit the map to the bounds of Georgia to ensure the entire country is visible
+  const bounds = new google.maps.LatLngBounds(
+    { lat: georgiaBounds.south, lng: georgiaBounds.west },
+    { lat: georgiaBounds.north, lng: georgiaBounds.east }
   );
-  map.setStreetView(streetViewPanorama);
+  map.fitBounds(bounds);
+
+  // Initialize Street View for the map, initially not visible
+  panorama = new google.maps.StreetViewPanorama(document.getElementById("map"), {
+    position: { lat: 41.7151, lng: 44.8271 },
+    pov: { heading: 165, pitch: 0 },
+    visible: false,
+  });
+  map.setStreetView(panorama);
+
+  // Initialize Traffic Layer
+  trafficLayer = new google.maps.TrafficLayer();
+
+  // Initialize Transit Layer
+  transitLayer = new google.maps.TransitLayer();
+
+  // Add event listener for toggling the Traffic Layer
+  document.getElementById("traffic-toggle").addEventListener("click", () => {
+    if (trafficLayer.getMap()) {
+      trafficLayer.setMap(null);
+    } else {
+      trafficLayer.setMap(map);
+    }
+  });
+
+  // Add event listener for toggling the Transit Layer
+  document.getElementById("transit-toggle").addEventListener("click", () => {
+    if (transitLayer.getMap()) {
+      transitLayer.setMap(null);
+    } else {
+      transitLayer.setMap(map);
+    }
+  });
+
+  // Add event listener for toggling the Street View
+  document.getElementById("streetview-toggle").addEventListener("click", () => {
+    panorama.setVisible(!panorama.getVisible());
+  });
+
+  // Add default markers to the map
+  addDefaultMarkers();
+
+  // Add click event listener to the map for adding new markers
+  map.addListener("click", (event) => {
+    addMarker(event.latLng);
+    saveMarker(event.latLng);
+  });
+
+  // Load saved markers from cookies and display them on the map
+  loadSavedMarkers();
 };
 
-const toggleStreetView = () => {
-  const toggle = streetViewPanorama.getVisible() ? false : true;
-  streetViewPanorama.setVisible(toggle);
-};
-
-const loadMarkersFromDefaultLocations = () => {
+/**
+ * Adds default markers to the map at predefined locations.
+ */
+const addDefaultMarkers = () => {
   defaultLocations.forEach((location) => {
-    placeMarker(new google.maps.LatLng(location.lat, location.lng), false);
+    new google.maps.Marker({
+      position: location,
+      map: map,
+      title: location.title,
+    });
   });
 };
 
-const loadMarkersFromSavedLocations = () => {
-  const savedLocations = getLocationsFromCookies();
-  savedLocations.forEach((location) => {
-    placeMarker(new google.maps.LatLng(location.lat, location.lng), false);
-  });
-};
-
-const placeMarker = (location, addToCookie) => {
-  const marker = new google.maps.Marker({
+/**
+ * Adds a marker to the map at the specified location.
+ * @param {google.maps.LatLng} location - The location to place the marker.
+ */
+const addMarker = (location) => {
+  new google.maps.Marker({
     position: location,
     map: map,
   });
-  markers.push(marker);
+};
 
-  selectedLocation = { lat: location.lat(), lng: location.lng() };
+/**
+ * Saves a marker location to cookies.
+ * @param {google.maps.LatLng} location - The location to save.
+ */
+const saveMarker = (location) => {
+  let markers = getSavedMarkers();
+  markers.push(location);
+  document.cookie = `markers=${JSON.stringify(markers)};path=/;max-age=31536000`;
+};
 
-  if (addToCookie) {
-    saveLocationToCookies(selectedLocation);
+/**
+ * Retrieves saved marker locations from cookies.
+ * @returns {Array} - An array of saved marker locations.
+ */
+const getSavedMarkers = () => {
+  let cookies = document.cookie.split(";");
+  for (let cookie of cookies) {
+    let [name, value] = cookie.split("=");
+    if (name.trim() === "markers") {
+      return JSON.parse(value);
+    }
   }
+  return [];
 };
 
-const saveLocation = () => {
-  if (selectedLocation) {
-    const jsonData = JSON.stringify(selectedLocation, null, 2);
-    downloadJSON(jsonData, "location.json");
-  } else {
-    alert("Please select a location on the map first.");
-  }
+/**
+ * Loads saved markers from cookies and adds them to the map.
+ */
+const loadSavedMarkers = () => {
+  let markers = getSavedMarkers();
+  markers.forEach((location) => {
+    addMarker(location);
+  });
 };
 
-const downloadJSON = (jsonData, filename) => {
-  const blob = new Blob([jsonData], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
-
-const getLocationsFromCookies = () => {
-  const cookieString = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("locations="));
-  return cookieString ? JSON.parse(cookieString.split("=")[1]) : [];
-};
-
+// Load the map when the window finishes loading
 window.onload = initMap;

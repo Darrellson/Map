@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Maps API Example</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps API Example</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf5FsuRhY_xLuVld4kH0CKdg8D7BlU2hI&libraries=places"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="map"></div>
-  <div id="controls">
-    <button id="toggle-traffic">Toggle Traffic</button>
-    <button id="toggle-transit">Toggle Transit</button>
-    <button id="pegman">Pegman</button>
-  </div>
+    <h1 class="text-center">Google Maps Example</h1>
+    <div id="map"></div>
+    <div class="containet mt-3">
+        <div class="controls">
+            <button id="traffic-toggle" class="btn btn-primary">Toggle Traffic</button>
+            <button id="transit-toggle" class="btn btn-primary">Toggle Transit</button>
+            <button id="streetview-toggle" class="btn btn-primary">Toggle Street View</button>
+        </div>
+    </div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf5FsuRhY_xLuVld4kH0CKdg8D7BlU2hI&libraries=places" async defer></script>
-  <script src="script.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
