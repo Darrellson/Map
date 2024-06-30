@@ -1,4 +1,4 @@
-let map, panorama, trafficLayer, transitLayer, satelliteLayer;
+let map, panorama, trafficLayer, transitLayer;
 
 /**
  * Defines the geographical bounds of Georgia (country).

@@ -1,11 +1,16 @@
-#controls {
+#map {
+  height: 80vh;
+  width: 100%;
+}
+
+.controls {
   display: flex;
   flex-wrap: wrap;
   padding: 10px;
   margin: 10px;
 }
-#map {
-  height: 80vh;
-  width: 100%;
+
+.controls button {
+  margin-right: 5px;
 }
 
