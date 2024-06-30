@@ -77,15 +77,6 @@ const initMap = () => {
     panorama.setVisible(!panorama.getVisible());
   });
 
-  // Add event listener for toggling the Satellite View
-  document.getElementById("satellite-toggle").addEventListener("click", () => {
-    if (map.getMapTypeId() === "satellite") {
-      map.setMapTypeId("roadmap");
-    } else {
-      map.setMapTypeId("satellite");
-    }
-  });
-
   // Add default markers to the map
   addDefaultMarkers();
 
