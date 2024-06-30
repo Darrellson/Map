@@ -1,4 +1,4 @@
-let map, panorama, trafficLayer, transitLayer;
+let map, panorama, trafficLayer, transitLayer, satelliteLayer;
 
 /**
  * Defines the geographical bounds of Georgia (country).
@@ -75,6 +75,15 @@ const initMap = () => {
   // Add event listener for toggling the Street View
   document.getElementById("streetview-toggle").addEventListener("click", () => {
     panorama.setVisible(!panorama.getVisible());
+  });
+
+  // Add event listener for toggling the Satellite View
+  document.getElementById("satellite-toggle").addEventListener("click", () => {
+    if (map.getMapTypeId() === "satellite") {
+      map.setMapTypeId("roadmap");
+    } else {
+      map.setMapTypeId("satellite");
+    }
   });
 
   // Add default markers to the map
