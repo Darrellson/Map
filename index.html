@@ -5,14 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Maps API</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAcwhj1ohS23bZf_QJlSMYtQuy4Dl1Tqkk&libraries=places" async></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places" async></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 class="text-center">Google Maps Example</h1>
+    <h1 class="text-center">Google Maps</h1>
     <div id="map"></div>
     <div class="container mt-3">
         <div class="controls">
+            <button id="roadmap" class="btn btn-primary">Roadmap</button>
+            <button id="satellite" class="btn btn-primary">Satellite</button>
+            <button id="terrain" class="btn btn-primary">Terrain</button>
             <button id="traffic-toggle" class="btn btn-primary">Toggle Traffic</button>
             <button id="transit-toggle" class="btn btn-primary">Toggle Transit</button>
             <button id="streetview-toggle" class="btn btn-primary">Toggle Street View</button>

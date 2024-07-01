@@ -1,11 +1,11 @@
-#controls {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 10px;
-  margin: 10px;
-}
-
 #map {
   height: 80vh;
   width: 100%;
+}
+.controls {
+  text-align: center;
+  margin-top: 10px;
+}
+.controls button {
+  margin: 5px;
 }
