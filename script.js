@@ -1,4 +1,4 @@
-let map, trafficLayer, transitLayer;
+let map, trafficLayer, transitLayer, markerClusterer;
 
 /**
  * Geographic bounds for Georgia.
@@ -10,9 +10,6 @@ const georgiaBounds = {
   west: 38.0,
 };
 
-/**
- * Initializes the Google Map and its components.
- */
 const initMap = () => {
   // Initialize the map with specified options
   map = new google.maps.Map(document.getElementById("map"), {
@@ -43,12 +40,18 @@ const initMap = () => {
 
   // Add event listeners for map type buttons
   mapTypeButtons.forEach(({ id, type }) => {
-    document.getElementById(id).addEventListener("click", () => map.setMapTypeId(type));
+    document.getElementById(id).addEventListener("click", () =>
+      map.setMapTypeId(type)
+    );
   });
 
   // Add event listeners for traffic and transit toggles
-  document.getElementById("traffic-toggle").addEventListener("click", toggleLayer(trafficLayer));
-  document.getElementById("transit-toggle").addEventListener("click", toggleLayer(transitLayer));
+  document
+    .getElementById("traffic-toggle")
+    .addEventListener("click", toggleLayer(trafficLayer));
+  document
+    .getElementById("transit-toggle")
+    .addEventListener("click", toggleLayer(transitLayer));
 
   // Load saved markers from cookies
   loadSavedMarkersFromCookies();
@@ -57,9 +60,16 @@ const initMap = () => {
   fetch("data.json")
     .then((response) => response.json())
     .then((locations) => {
-      addMarkersFromLocations(locations);
+      const markers = addMarkersFromLocations(locations);
+      // Initialize marker clusterer
+      markerClusterer = new MarkerClusterer(map, markers, {
+        imagePath:
+          "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+      });
     })
-    .catch((error) => console.error("Error loading JSON locations:", error));
+    .catch((error) =>
+      console.error("Error loading JSON locations:", error)
+    );
 
   // Add click event listener to the map for adding new markers
   map.addListener("click", (event) => {
@@ -70,6 +80,7 @@ const initMap = () => {
 /**
  * Adds markers from the specified locations to the map.
  * @param {Array} locations - Array of location objects with lat, lng, and title.
+ * @returns {Array} An array of Google Maps Marker objects.
  */
 const addMarkersFromLocations = (locations) => {
   const markers = [];
@@ -80,17 +91,16 @@ const addMarkersFromLocations = (locations) => {
         lng: location.lng + (Math.random() - 0.5) * 0.01,
         title: location.title,
       };
-      markers.push(marker);
-      new google.maps.Marker({
+      markers.push(new google.maps.Marker({
         position: { lat: marker.lat, lng: marker.lng },
-        map,
         title: marker.title,
-      });
+      }));
       console.log("Added marker at:", marker);
     }
   });
   saveMarkersToJSON(markers);
   saveMarkersToCookies(markers);
+  return markers;
 };
 
 /**
@@ -150,6 +160,9 @@ const addMarker = (location) => {
   markers.push(location);
   saveMarkersToJSON(markers);
   saveMarkersToCookies(markers);
+
+  // Add marker to marker clusterer
+  markerClusterer.addMarker(marker);
 };
 
 /**
