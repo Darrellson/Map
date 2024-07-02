@@ -40,9 +40,9 @@ const initMap = () => {
 
   // Add event listeners for map type buttons
   mapTypeButtons.forEach(({ id, type }) => {
-    document.getElementById(id).addEventListener("click", () =>
-      map.setMapTypeId(type)
-    );
+    document
+      .getElementById(id)
+      .addEventListener("click", () => map.setMapTypeId(type));
   });
 
   // Add event listeners for traffic and transit toggles
@@ -67,9 +67,7 @@ const initMap = () => {
           "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
       });
     })
-    .catch((error) =>
-      console.error("Error loading JSON locations:", error)
-    );
+    .catch((error) => console.error("Error loading JSON locations:", error));
 
   // Add click event listener to the map for adding new markers
   map.addListener("click", (event) => {
@@ -91,10 +89,12 @@ const addMarkersFromLocations = (locations) => {
         lng: location.lng + (Math.random() - 0.5) * 0.01,
         title: location.title,
       };
-      markers.push(new google.maps.Marker({
-        position: { lat: marker.lat, lng: marker.lng },
-        title: marker.title,
-      }));
+      markers.push(
+        new google.maps.Marker({
+          position: { lat: marker.lat, lng: marker.lng },
+          title: marker.title,
+        })
+      );
       console.log("Added marker at:", marker);
     }
   });
@@ -116,7 +116,9 @@ const saveMarkersToJSON = (markers) => {
  * @param {Array} markers - Array of marker locations.
  */
 const saveMarkersToCookies = (markers) => {
-  document.cookie = `markers=${encodeURIComponent(JSON.stringify(markers))};path=/`;
+  document.cookie = `markers=${encodeURIComponent(
+    JSON.stringify(markers)
+  )};path=/`;
 };
 
 /**
@@ -135,10 +137,12 @@ const loadSavedMarkersFromCookies = () => {
  * @returns {Array} An array of saved marker locations.
  */
 const getSavedMarkersFromCookies = () => {
-  const cookies = document.cookie.split(';');
-  const markersCookie = cookies.find(cookie => cookie.trim().startsWith('markers='));
+  const cookies = document.cookie.split(";");
+  const markersCookie = cookies.find((cookie) =>
+    cookie.trim().startsWith("markers=")
+  );
   if (markersCookie) {
-    const markersJSON = markersCookie.split('=')[1];
+    const markersJSON = markersCookie.split("=")[1];
     return markersJSON ? JSON.parse(decodeURIComponent(markersJSON)) : [];
   }
   return [];
