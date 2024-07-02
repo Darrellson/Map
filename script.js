@@ -26,7 +26,6 @@ const initMap = () => {
   // Initialize the map with specified options
   map = new google.maps.Map(document.getElementById("map"), {
     mapTypeId: "roadmap",
-    streetViewControl: false,
     restriction: {
       latLngBounds: georgiaBounds,
       strictBounds: true,
@@ -40,16 +39,6 @@ const initMap = () => {
   );
   map.fitBounds(bounds);
 
-  // Initialize the Street View Panorama
-  panorama = new google.maps.StreetViewPanorama(
-    document.getElementById("map"),
-    {
-      position: { lat: 41.7151, lng: 44.8271 },
-      pov: { heading: 165, pitch: 0 },
-      visible: false,
-    }
-  );
-  map.setStreetView(panorama);
 
   // Initialize traffic and transit layers
   trafficLayer = new google.maps.TrafficLayer();
@@ -76,11 +65,6 @@ const initMap = () => {
   document
     .getElementById("transit-toggle")
     .addEventListener("click", toggleLayer(transitLayer));
-
-  // Add event listener for Street View toggle
-  document.getElementById("streetview-toggle").addEventListener("click", () => {
-    panorama.setVisible(!panorama.getVisible());
-  });
 
   // Add default markers to the map
   addDefaultMarkers();
