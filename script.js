@@ -1,4 +1,4 @@
-let map, panorama, trafficLayer, transitLayer;
+let map, trafficLayer, transitLayer;
 
 /**
  * Geographic bounds for Georgia.
@@ -9,15 +9,6 @@ const georgiaBounds = {
   east: 49.0,
   west: 38.0,
 };
-
-/**
- * Default locations for markers in Georgia.
- */
-const defaultLocations = [
-  { lat: 41.7151, lng: 44.8271, title: "Tbilisi" },
-  { lat: 42.2679, lng: 42.718, title: "Kutaisi" },
-  { lat: 41.6168, lng: 41.6367, title: "Batumi" },
-];
 
 /**
  * Initializes the Google Map and its components.
@@ -38,7 +29,6 @@ const initMap = () => {
     { lat: georgiaBounds.north, lng: georgiaBounds.east }
   );
   map.fitBounds(bounds);
-
 
   // Initialize traffic and transit layers
   trafficLayer = new google.maps.TrafficLayer();
@@ -66,72 +56,87 @@ const initMap = () => {
     .getElementById("transit-toggle")
     .addEventListener("click", toggleLayer(transitLayer));
 
-  // Add default markers to the map
-  addDefaultMarkers();
+  // Load markers from JSON file and add them to the map
+  fetch("data.json")
+    .then((response) => response.json())
+    .then((data) => {
+      data.forEach((marker) => {
+        for (let i = 0; i < 50; i++) {
+          const randomMarker = generateRandomMarker(marker);
+          new google.maps.Marker({
+            position: randomMarker,
+            map,
+            title: marker.title,
+          });
+        }
+      });
+    });
 
-  // Add a click event listener to the map to add and save markers
-  map.addListener("click", (event) => {
-    addMarker(event.latLng);
-    saveMarker(event.latLng);
-  });
+  // Generate and add default markers to the map
+  generateAndAddMarkers();
 
-  // Load saved markers from cookies
+  // Load saved markers from localStorage
   loadSavedMarkers();
 };
 
 /**
- * Adds default markers to the map based on predefined locations.
+ * Generates random markers around the default locations and adds them to the map.
  */
-const addDefaultMarkers = () => {
-  defaultLocations.forEach(({ lat, lng, title }) => {
-    new google.maps.Marker({
-      position: { lat, lng },
-      map,
-      title,
-    });
+const generateAndAddMarkers = () => {
+  const markers = [];
+  defaultLocations.forEach((location) => {
+    for (let i = 0; i < 50; i++) {
+      const marker = generateRandomMarker(location);
+      markers.push(marker);
+      new google.maps.Marker({
+        position: marker,
+        map,
+        title: location.title,
+      });
+    }
+  });
+  saveMarkersToJSON(markers);
+};
+
+/**
+ * Generates a random marker around a given location.
+ * @param {Object} location - The base location with lat and lng.
+ * @returns {Object} - The generated marker with lat and lng.
+ */
+const generateRandomMarker = (location) => {
+  const latOffset = (Math.random() - 0.5) * 0.1;
+  const lngOffset = (Math.random() - 0.5) * 0.1;
+  return {
+    lat: location.lat + latOffset,
+    lng: location.lng + lngOffset,
+  };
+};
+
+/**
+ * Saves markers array to JSON format in localStorage.
+ * @param {Array} markers - Array of marker locations.
+ */
+const saveMarkersToJSON = (markers) => {
+  localStorage.setItem("markers", JSON.stringify(markers));
+};
+
+/**
+ * Loads saved markers from localStorage and adds them to the map.
+ */
+const loadSavedMarkers = () => {
+  const markers = getSavedMarkers();
+  markers.forEach((marker) => {
+    new google.maps.Marker({ position: marker, map });
   });
 };
 
 /**
- * Adds a marker to the map at the specified location.
- * @param {google.maps.LatLng} location - The location where the marker will be placed.
- */
-const addMarker = (location) => {
-  new google.maps.Marker({ position: location, map });
-};
-
-/**
- * Saves a marker's location to cookies.
- * @param {google.maps.LatLng} location - The location of the marker to be saved.
- */
-const saveMarker = (location) => {
-  const markers = getSavedMarkers();
-  markers.push(location);
-  document.cookie = `markers=${JSON.stringify(
-    markers
-  )};path=/;max-age=31536000`;
-};
-
-/**
- * Retrieves saved markers from cookies.
+ * Retrieves saved markers from localStorage.
  * @returns {Array} An array of saved marker locations.
  */
 const getSavedMarkers = () => {
-  const cookies = document.cookie.split(";");
-  for (const cookie of cookies) {
-    const [name, value] = cookie.split("=");
-    if (name.trim() === "markers") {
-      return JSON.parse(value);
-    }
-  }
-  return [];
-};
-
-/**
- * Loads saved markers from cookies and adds them to the map.
- */
-const loadSavedMarkers = () => {
-  getSavedMarkers().forEach(addMarker);
+  const markersJSON = localStorage.getItem("markers");
+  return markersJSON ? JSON.parse(markersJSON) : [];
 };
 
 /**
