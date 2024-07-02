@@ -50,28 +50,16 @@ const initMap = () => {
   document.getElementById("traffic-toggle").addEventListener("click", toggleLayer(trafficLayer));
   document.getElementById("transit-toggle").addEventListener("click", toggleLayer(transitLayer));
 
-  // Load markers from JSON file and add them to the map
-  fetch("data.json")
-    .then((response) => response.json())
-    .then((data) => {
-      data.forEach((marker) => {
-        for (let i = 0; i < 50; i++) {
-          const randomMarker = generateRandomMarker(marker);
-          new google.maps.Marker({
-            position: randomMarker,
-            map,
-            title: marker.title,
-          });
-        }
-      });
-    })
-    .catch((error) => console.error("Error loading JSON markers:", error));
-
-  // Generate and add default markers to the map
-  generateAndAddMarkers();
-
   // Load saved markers from cookies
   loadSavedMarkersFromCookies();
+
+  // Load locations from JSON file and add markers
+  fetch("data.json")
+    .then((response) => response.json())
+    .then((locations) => {
+      addMarkersFromLocations(locations);
+    })
+    .catch((error) => console.error("Error loading JSON locations:", error));
 
   // Add click event listener to the map for adding new markers
   map.addListener("click", (event) => {
@@ -80,38 +68,29 @@ const initMap = () => {
 };
 
 /**
- * Generates random markers around the default locations and adds them to the map.
+ * Adds markers from the specified locations to the map.
+ * @param {Array} locations - Array of location objects with lat, lng, and title.
  */
-const generateAndAddMarkers = () => {
+const addMarkersFromLocations = (locations) => {
   const markers = [];
-  defaultLocations.forEach((location) => {
+  locations.forEach((location) => {
     for (let i = 0; i < 50; i++) {
-      const marker = generateRandomMarker(location);
+      const marker = {
+        lat: location.lat + (Math.random() - 0.5) * 0.01, // Adding slight randomness to avoid exact overlaps
+        lng: location.lng + (Math.random() - 0.5) * 0.01,
+        title: location.title,
+      };
       markers.push(marker);
       new google.maps.Marker({
-        position: marker,
+        position: { lat: marker.lat, lng: marker.lng },
         map,
-        title: location.title,
+        title: marker.title,
       });
       console.log("Added marker at:", marker);
     }
   });
   saveMarkersToJSON(markers);
   saveMarkersToCookies(markers);
-};
-
-/**
- * Generates a random marker around a given location.
- * @param {Object} location - The base location with lat and lng.
- * @returns {Object} - The generated marker with lat and lng.
- */
-const generateRandomMarker = (location) => {
-  const latOffset = (Math.random() - 0.5) * 0.1;
-  const lngOffset = (Math.random() - 0.5) * 0.1;
-  return {
-    lat: location.lat + latOffset,
-    lng: location.lng + lngOffset,
-  };
 };
 
 /**
@@ -127,7 +106,7 @@ const saveMarkersToJSON = (markers) => {
  * @param {Array} markers - Array of marker locations.
  */
 const saveMarkersToCookies = (markers) => {
-  document.cookie = `markers=${JSON.stringify(markers)};path=/`;
+  document.cookie = `markers=${encodeURIComponent(JSON.stringify(markers))};path=/`;
 };
 
 /**

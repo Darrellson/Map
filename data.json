@@ -1,10 +1,10 @@
 [
-    {"lat": 41.7151, "lng": 44.8271, "title": "Tbilisi"},
-    {"lat": 42.2679, "lng": 42.718, "title": "Kutaisi"},
-    {"lat": 41.6168, "lng": 41.6367, "title": "Batumi"},
-    {"lat": 41.8397, "lng": 44.7547, "title": "Borjomi"},
-    {"lat": 42.1469, "lng": 41.6767, "title": "Poti"},
-    {"lat": 42.2682, "lng": 42.7047, "title": "Senaki"},
-    {"lat": 41.7500, "lng": 43.5300, "title": "Bakuriani"},
-    {"lat": 41.7369, "lng": 45.3367, "title": "Sagarejo"}
+  { "lat": 41.7151, "lng": 44.8271, "title": "Tbilisi" },
+  { "lat": 42.2679, "lng": 42.6946, "title": "Kutaisi" },
+  { "lat": 41.6168, "lng": 41.6367, "title": "Batumi" },
+  { "lat": 41.84, "lng": 43.3914, "title": "Borjomi" },
+  { "lat": 42.1468, "lng": 41.6733, "title": "Poti" },
+  { "lat": 42.271, "lng": 42.0679, "title": "Senaki" },
+  { "lat": 41.7497, "lng": 43.5329, "title": "Bakuriani" },
+  { "lat": 41.7339, "lng": 45.3333, "title": "Sagarejo" }
 ]
